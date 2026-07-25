@@ -3,12 +3,12 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
-export default function Hero() {
+const Heading = () => {
   return (
     <div className="flex flex-row items-center justify-center bg-[#3BEA5E] text-white w-full h-full">
       <div className="flex flex-col items-start justify-center w-192.25 h-full p-4 text-start">
         <h2 className="text-6xl font-bold">
-          Find Local Players.<br/>Join Games.<br/>Build Friendships.
+          Find Local Players.<br />Join Games.<br />Build Friendships.
         </h2>
         <h4 className="text-4xl font-normal max-w-150">
           Connect with nearby players for Chess, Carrom, Cards, Badminton, Table Tennis, Cricket and more.
@@ -52,8 +52,8 @@ export default function Hero() {
       </div>
       <div className="w-146 h-full flex items-center justify-center relative bottom-4">
         <Image
-          src="/hero.svg"
-          alt="Hero Image"
+          src="/heading.svg"
+          alt="Heading Image"
           width={450}
           height={250}
           className="w-full h-full p-4"
@@ -61,4 +61,6 @@ export default function Hero() {
       </div>
     </div>
   );
-}
+};
+
+export default Heading;

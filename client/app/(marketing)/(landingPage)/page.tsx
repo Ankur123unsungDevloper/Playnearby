@@ -1,9 +1,27 @@
-import Hero from "./_components/hero";
+// import Bento from "./_components/bento";
+// import Endless from "./_components/endless";
+// import Features from "./_components/features";
+import Heading from "./_components/heading";
+// import Heroes from "./_components/heroes";
+// import Heroine from "./_components/heroine";
+// import IgnoreTools from "./_components/ignoretools";
+// import Partner from "./_components/partner";
+// import Services from "./_components/services";
 
-export default function LandingPage() {
+const LandingPage = () => {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full">
-      <Hero />
+    <div className="flex flex-col items-center justify-center md:justify-start text-center w-full h-full mt-17">
+      <Heading />
+      {/* <Heroes />
+      <Partner />
+      <IgnoreTools />
+      <Features />
+      <Services />
+      <Bento />
+      <Endless />
+      <Heroine /> */}
     </div>
   );
 }
+
+export default LandingPage;
