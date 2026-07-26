@@ -67,7 +67,7 @@ const Heading = () => {
               text-2xl
             "
           />
-          <MdSearch className="text-3xl text-white" />
+          <MdSearch className="text-4xl text-white text-bold" />
         </div>
         <div
           id="heading-search"
