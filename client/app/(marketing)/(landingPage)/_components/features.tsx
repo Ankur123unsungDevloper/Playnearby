@@ -38,7 +38,7 @@ const features = [
 
 const Features = () => {
   return (
-    <section className="relative overflow-hidden bg-background py-32">
+    <div className="relative overflow-hidden bg-background py-32">
       {/* Background Blur */}
       <div className="absolute -left-32 top-20 h-96 w-96 rounded-full bg-primary/10 blur-[120px]" />
       <div className="absolute -right-32 bottom-20 h-96 w-96 rounded-full bg-green-300/20 blur-[120px]" />
@@ -128,7 +128,7 @@ const Features = () => {
           })}
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

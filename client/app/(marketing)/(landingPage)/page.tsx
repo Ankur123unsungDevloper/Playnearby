@@ -3,10 +3,10 @@
 import Features from "./_components/features";
 import Heading from "./_components/heading";
 import Heroes from "./_components/heroes";
+import Services from "./_components/services";
 // import Heroine from "./_components/heroine";
 // import IgnoreTools from "./_components/ignoretools";
 // import Partner from "./_components/partner";
-// import Services from "./_components/services";
 
 const LandingPage = () => {
   return (
@@ -14,8 +14,8 @@ const LandingPage = () => {
       <Heading />
       <Heroes />
       <Features />
-      {/*<Services />
-      <Bento />
+      <Services />
+      {/*<Bento />
       <Endless />
       <Heroine /> */}
     </div>
