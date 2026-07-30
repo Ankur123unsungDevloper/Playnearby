@@ -16,8 +16,8 @@ const LandingPage = () => {
       <Features />
       <Services />
       <FavSport />
-      {/*<Endless />
-      <Heroine /> */}
+      {/*<Endless />*/}
+      {/*<Heroine />*/}
     </div>
   );
 }
