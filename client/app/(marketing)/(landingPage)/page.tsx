@@ -1,5 +1,5 @@
-// import Bento from "./_components/bento";
 // import Endless from "./_components/endless";
+import FavSport from "./_components/favSport";
 import Features from "./_components/features";
 import Heading from "./_components/heading";
 import Heroes from "./_components/heroes";
@@ -15,8 +15,8 @@ const LandingPage = () => {
       <Heroes />
       <Features />
       <Services />
-      {/*<Bento />
-      <Endless />
+      <FavSport />
+      {/*<Endless />
       <Heroine /> */}
     </div>
   );
