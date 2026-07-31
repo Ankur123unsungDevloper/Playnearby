@@ -13,8 +13,15 @@ import {
   GiTennisRacket,
   GiPingPongBat,
 } from "react-icons/gi";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Card,
+  CardContent
+} from "@/components/ui/card";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage
+} from "@/components/ui/avatar";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -384,7 +391,7 @@ function GameCard({ game }: { game: GameSession }) {
               </span>
             )}
           </div>
-          <h3 className="text-sm font-medium text-white/90">
+          <h3 className="text-sm font-medium text-white/90 relative top-20">
             {game.host.name} &middot; {game.hearts.toLocaleString()} Hearts
           </h3>
         </div>

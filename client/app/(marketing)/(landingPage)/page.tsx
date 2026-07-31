@@ -1,12 +1,10 @@
 // import Endless from "./_components/endless";
+import Blogs from "./_components/blogs";
 import FavSport from "./_components/favSport";
 import Features from "./_components/features";
 import Heading from "./_components/heading";
 import Heroes from "./_components/heroes";
 import Services from "./_components/services";
-// import Heroine from "./_components/heroine";
-// import IgnoreTools from "./_components/ignoretools";
-// import Partner from "./_components/partner";
 
 const LandingPage = () => {
   return (
@@ -17,7 +15,7 @@ const LandingPage = () => {
       <Services />
       <FavSport />
       {/*<Endless />*/}
-      {/*<Heroine />*/}
+      <Blogs />
     </div>
   );
 }

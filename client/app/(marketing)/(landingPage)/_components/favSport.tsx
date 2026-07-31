@@ -3,7 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaChessKnight } from "react-icons/fa6";
-import { GiSoccerBall, GiCricketBat, GiShuttlecock } from "react-icons/gi";
+import {
+  GiSoccerBall,
+  GiCricketBat,
+  GiShuttlecock
+} from "react-icons/gi";
 import { MdPool } from "react-icons/md";
 import { TbDisc } from "react-icons/tb";
 
