@@ -1,6 +1,7 @@
 // import Endless from "./_components/endless";
 import AboutUs from "./_components/aboutUs";
 import Blogs from "./_components/blogs";
+import FAQ from "./_components/faq";
 import FavSport from "./_components/favSport";
 import Features from "./_components/features";
 import Heading from "./_components/heading";
@@ -18,6 +19,7 @@ const LandingPage = () => {
       {/*<Endless />*/}
       <Blogs />
       <AboutUs />
+      <FAQ />
     </div>
   );
 }
