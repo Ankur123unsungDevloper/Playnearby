@@ -425,7 +425,7 @@ function VenueCard({ venue }: { venue: Venue }) {
   return (
     <Card
       onClick={() => (window.location.href = venue.href)}
-      className="group relative h-70 w-130 flex-none snap-start overflow-hidden rounded-3xl bg-primary p-0 shadow-[0_8px_24px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_16px_36px_rgba(0,0,0,0.16)] hover:cursor-pointer"
+      className="group relative h-70 w-120 flex-none snap-start overflow-hidden rounded-3xl bg-primary p-0 shadow-[0_8px_24px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_16px_36px_rgba(0,0,0,0.16)] hover:cursor-pointer"
     >
       <CardContent className="flex h-full w-full flex-col p-3">
         {/* Image */}
