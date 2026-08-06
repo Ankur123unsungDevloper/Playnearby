@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Space_Grotesk } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,7 +24,11 @@ export default function RootLayout({
       lang="en"
       className="h-full antialiased"
     >
-      <body className={"min-h-full flex flex-col " + spaceGrotesk.className}>{children}</body>
+      <body className={"min-h-full flex flex-col " + spaceGrotesk.className}>
+        <ClerkProvider>
+          {children}
+        </ClerkProvider>
+      </body>
     </html>
   );
 }
