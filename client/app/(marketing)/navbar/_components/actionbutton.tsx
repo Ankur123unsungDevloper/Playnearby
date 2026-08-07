@@ -17,8 +17,8 @@ export default function ActionButton() {
         variant="outline"
         className="border-primary text-primary hover:bg-primary hover:text-white font-bold py-2 px-4 rounded w-30"
       >
-        <Link href="/sign-out">
-          Logout
+        <Link href="/sign-up">
+          Sign Up
         </Link>
       </Button>
     </div>
