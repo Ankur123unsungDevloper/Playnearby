@@ -8,7 +8,6 @@ import Logo from "@/components/logo";
 import ActionButton from "./_components/actionbutton";
 import Search from "./_components/search";
 
-
 const Navbar = () => {
   const scrolled = useScrollTop();
   const searchScrolled = useHeadingSearchScrolled();
@@ -16,22 +15,27 @@ const Navbar = () => {
   return (
     <div
       className={cn(
-        "z-50 bg-white fixed top-0 flex items-center justify-center w-full pt-2 pl-5",
+        "z-50 bg-white fixed top-0 left-0 flex items-center justify-between w-full px-5 py-2",
         scrolled && "border-b shadow-sm"
       )}
     >
-      <Logo />
+      {/* Left: logo, fixed size, never shrinks */}
+      <div className="flex-none">
+        <Logo />
+      </div>
+
+      {/* Center: search, fades in on scroll, ignores clicks while hidden */}
       <div
         className={cn(
-          "overflow-hidden transition-all duration-700 ease-[cubic-bezier(.22,1,.36,1)]",
-          searchScrolled
-          ? "opacity-100"
-          : "opacity-0"
+          "flex-1 flex justify-center overflow-hidden px-4 transition-all duration-700 ease-[cubic-bezier(.22,1,.36,1)]",
+          searchScrolled ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
       >
-          <Search />
+        <Search />
       </div>
-      <div className="md:ml-auto md:justify-end justify-between w-full flex items-center gap-x-2 relative left-80">
+
+      {/* Right: auth buttons / avatar, fixed size, never shrinks */}
+      <div className="flex-none flex items-center gap-x-2">
         <ActionButton />
       </div>
     </div>

@@ -18,20 +18,21 @@ const COPY: Record<AuthMode, { heading: string; subtext: string }> = {
 
 type Player = {
   id: number;
-  name: string;
   sport: string;
   emoji: string;
+  message: string;
   top: string;
   left: string;
   color: string; // tailwind bg-* class
+  bubblePos: "top" | "bottom";
 };
 
 const NEARBY_PLAYERS: Player[] = [
-  { id: 1, name: "Priya", sport: "Badminton", emoji: "🏸", top: "20%", left: "70%", color: "bg-[#FF9F7A]" },
-  { id: 2, name: "Meera", sport: "Tennis", emoji: "🎾", top: "65%", left: "75%", color: "bg-[#78F190]" },
-  { id: 3, name: "Ananya", sport: "Basketball", emoji: "🏀", top: "72%", left: "25%", color: "bg-[#FFD97A]" },
-  { id: 4, name: "Fatima", sport: "Pickleball", emoji: "🏓", top: "25%", left: "20%", color: "bg-[#7AD9FF]" },
-  { id: 5, name: "Kavya", sport: "Football", emoji: "⚽", top: "12%", left: "48%", color: "bg-[#FF7AA8]" },
+  { id: 1, sport: "Tennis", emoji: "🎾", message: "I'm available! 👍", top: "14%", left: "74%", color: "bg-[#FFD97A]", bubblePos: "top" },
+  { id: 2, sport: "Football", emoji: "⚽", message: "Hey!", top: "28%", left: "26%", color: "bg-[#8FD9C4]", bubblePos: "top" },
+  { id: 3, sport: "Volleyball", emoji: "🏐", message: "I'm always in!", top: "56%", left: "10%", color: "bg-[#7AD9FF]", bubblePos: "bottom" },
+  { id: 4, sport: "Basketball", emoji: "🏀", message: "At 7?", top: "78%", left: "22%", color: "bg-[#FFB37A]", bubblePos: "top" },
+  { id: 5, sport: "Badminton", emoji: "🏸", message: "Wanna play today?", top: "72%", left: "70%", color: "bg-[#FF9FA8]", bubblePos: "bottom" },
 ];
 
 const ClerkLayout = ({
@@ -55,21 +56,28 @@ const ClerkLayout = ({
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 overflow-hidden bg-white">
-      {/* Left — live radar map */}
+      {/* Left — nearby players map */}
       <div className="relative h-full bg-primary hidden lg:flex items-center justify-center overflow-hidden">
         {/* ambient glow */}
         <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-[#78f190] opacity-20 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 right-0 h-80 w-80 rounded-full bg-[#78f190] opacity-10 blur-3xl" />
 
-        {/* faint map grid, like streets on a city map */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+        {/* stylized map backdrop: roads, a park, a waterline */}
+        <svg
+          className="pointer-events-none absolute inset-0 h-full w-full"
+          viewBox="0 0 400 800"
+          preserveAspectRatio="none"
+        >
+          <path d="M-20,550 C40,500 60,600 20,680 C-10,730 -30,650 -20,550 Z" fill="#7AD9FF" opacity="0.12" />
+          <path d="M300,60 C380,40 420,120 360,170 C300,210 250,150 260,100 C265,75 280,65 300,60 Z" fill="#78f190" opacity="0.15" />
+          <path d="M40,300 C90,280 120,330 90,370 C60,400 10,370 20,330 C25,310 30,305 40,300 Z" fill="#78f190" opacity="0.1" />
+          <path d="M-10,120 C120,90 220,180 410,140" stroke="#fff" strokeWidth="5" opacity="0.18" fill="none" strokeLinecap="round" />
+          <path d="M-10,260 C140,300 260,220 410,280" stroke="#fff" strokeWidth="4" opacity="0.15" fill="none" strokeLinecap="round" />
+          <path d="M60,-10 C40,150 120,300 90,500 C70,620 130,700 100,810" stroke="#fff" strokeWidth="4" opacity="0.15" fill="none" strokeLinecap="round" />
+          <path d="M340,-10 C300,150 360,300 320,480 C290,600 350,700 330,810" stroke="#fff" strokeWidth="3" opacity="0.12" fill="none" strokeLinecap="round" />
+          <path d="M-10,480 C120,440 240,520 410,470" stroke="#fff" strokeWidth="3" opacity="0.12" fill="none" strokeLinecap="round" />
+          <path d="M-10,640 C140,600 260,680 410,630" stroke="#fff" strokeWidth="3" opacity="0.1" fill="none" strokeLinecap="round" />
+        </svg>
 
         {/* live status badge */}
         <div className="absolute top-10 left-10 flex items-center gap-2 rounded-full bg-black/20 px-3 py-1.5 backdrop-blur-sm">
@@ -82,45 +90,22 @@ const ClerkLayout = ({
           </span>
         </div>
 
-        <div className="relative flex flex-col items-center gap-8">
-          <div className="relative aspect-square w-180 max-w-[85%]">
-            {/* distance rings */}
-            {[100, 75, 50, 25].map((size) => (
-              <div
-                key={size}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10"
-                style={{ width: `${size}%`, height: `${size}%` }}
-              />
-            ))}
-
-            {/* rotating radar sweep */}
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-full w-full rounded-full overflow-hidden motion-safe:animate-spin"
-              style={{ animationDuration: "6s" }}
-            >
-              <div
-                className="h-full w-full"
-                style={{
-                  background:
-                    "conic-gradient(from 0deg, rgba(120,241,144,0.35), transparent 35%)",
-                }}
-              />
-            </div>
-
-            {/* "you" pin, center */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <span className="absolute -inset-3 rounded-full bg-[#78f190]/40 motion-safe:animate-ping" />
-              <span
-                className="absolute -inset-6 rounded-full bg-[#78f190]/20 motion-safe:animate-ping"
-                style={{ animationDelay: "0.6s" }}
-              />
-              <div className="relative h-4 w-4 rounded-full bg-white ring-4 ring-[#78f190]" />
-              <span className="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap text-[11px] font-semibold text-white/90">
+        <div className="relative flex flex-col items-center gap-10">
+          <div className="relative aspect-square w-100 max-w-[88%]">
+            {/* "you", centered */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+              <span className="absolute -inset-4 rounded-full bg-[#78f190]/30 motion-safe:animate-ping" />
+              <div className="relative flex h-32 w-32 items-center justify-center rounded-full bg-linear-to-br from-[#78f190] to-primary ring-4 ring-white shadow-2xl">
+                <svg viewBox="0 0 24 24" className="h-14 w-14 text-white" fill="currentColor">
+                  <path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z" />
+                </svg>
+              </div>
+              <span className="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap text-xs font-semibold text-white/90">
                 You
               </span>
             </div>
 
-            {/* nearby players, revealed as "detected" one by one */}
+            {/* nearby players, each with a floating chat bubble */}
             {NEARBY_PLAYERS.map((p, i) => (
               <div
                 key={p.id}
@@ -129,25 +114,28 @@ const ClerkLayout = ({
                 }`}
                 style={{ top: p.top, left: p.left, transitionDelay: `${300 + i * 220}ms` }}
               >
-                <div className="relative flex h-15 w-15 items-center justify-center">
-                  <span className={`absolute inset-0 rounded-full opacity-40 motion-safe:animate-ping ${p.color}`} />
-                  <span className={`relative flex h-15 w-15 items-center justify-center rounded-full text-lg shadow-lg shadow-black/20 ${p.color}`}>
-                    {p.emoji}
-                  </span>
+                <div className="flex flex-col items-center">
+                  {p.bubblePos === "top" && (
+                    <span className="-mb-1 whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-800 shadow-md">
+                      {p.message}
+                    </span>
+                  )}
+
+                  <div className="relative flex h-16 w-16 items-center justify-center">
+                    <span className={`absolute inset-0 rounded-full opacity-40 motion-safe:animate-ping ${p.color}`} />
+                    <span className={`relative flex h-16 w-16 items-center justify-center rounded-full text-2xl ring-4 ring-white shadow-lg shadow-black/20 ${p.color}`}>
+                      {p.emoji}
+                    </span>
+                  </div>
+
+                  {p.bubblePos === "bottom" && (
+                    <span className="-mt-1 whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-800 shadow-md">
+                      {p.message}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
-
-            {/* one detected match surfaced as a detail card */}
-            <div
-              className={`absolute w-40 rounded-xl bg-white/95 px-3 py-2 shadow-xl transition-all duration-700 motion-reduce:duration-0 ${
-                mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-              }`}
-              style={{ top: "4%", left: "72%", transitionDelay: "900ms" }}
-            >
-              <p className="text-xs font-semibold text-gray-900">Priya · Badminton</p>
-              <p className="text-[11px] text-gray-500">0.8 km away · Intermediate</p>
-            </div>
           </div>
 
           <p className="max-w-xs text-center text-sm text-white/70">
