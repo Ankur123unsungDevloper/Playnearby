@@ -27,7 +27,11 @@ app.use(morgan("dev"));
 app.use("/api/webhooks", webhooksRouter);
 
 app.use(express.json());
-app.use(clerkMiddleware());
+app.use(
+  clerkMiddleware({
+    publishableKey: "pk_test_Y29tcG9zZWQtc3R1cmdlb24tOTQuY2xlcmsuYWNjb3VudHMuZGV2JA",
+  }),
+);
 
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 

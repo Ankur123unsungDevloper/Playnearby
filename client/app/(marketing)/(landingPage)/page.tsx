@@ -1,4 +1,5 @@
-// import Endless from "./_components/endless";
+import DownloadApp from "@/components/DownloadApp";
+
 import AboutUs from "./_components/aboutUs";
 import Blogs from "./_components/blogs";
 import FAQ from "./_components/faq";
@@ -16,12 +17,14 @@ const LandingPage = () => {
       <Features />
       <Services />
       <FavSport />
-      {/*<Endless />*/}
+      {/* <Endless /> */}
       <Blogs />
       <AboutUs />
       <FAQ />
+
+      <DownloadApp />
     </div>
   );
-}
+};
 
 export default LandingPage;
