@@ -1,14 +1,15 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // No `url` here anymore in Prisma 7 — it now lives in prisma.config.ts,
+  // and PrismaClient itself gets its connection via a driver adapter
+  // (see src/lib/prisma.ts) instead of reading this file at runtime.
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-// Matches the SportKey union already used across the frontend
-// (FavSport, Services, Heroes). Add new sports here as a one-line change.
 enum Sport {
   football
   cricket
@@ -33,9 +34,6 @@ enum BookingStatus {
   cancelled
 }
 
-// Mirrors the authenticated person. Keyed by Clerk's userId (`clerkId`) —
-// Clerk owns identity/auth entirely; this table only holds app-specific data
-// (hearts/karma, hosted games, bookings) that Clerk has no concept of.
 model User {
   id        String   @id @default(cuid())
   clerkId   String   @unique
@@ -67,16 +65,15 @@ model Venue {
   games    GameSession[]
   bookings Booking[]
 
-  // Speeds up ORDER BY rating / featured filtering on the venues list.
   @@index([rating])
 }
 
 model GameSession {
   id        String     @id @default(cuid())
   sport     Sport
-  format    String // e.g. "Doubles · Regular", "7 A Side · Regular"
-  level     String // e.g. "Beginner - Professional"
-  stateTag  String? // e.g. "MH"
+  format    String
+  level     String
+  stateTag  String?
   startsAt  DateTime
   endsAt    DateTime
   capacity  Int        @default(10)
@@ -94,10 +91,6 @@ model GameSession {
   @@index([status, startsAt])
 }
 
-// Join table between User and GameSession — a player can join many games,
-// a game can have many players. The host is stored separately on
-// GameSession.hostId (a host doesn't have to also be a "participant" row,
-// though your UI can choose to display them as one via the API response).
 model GameParticipant {
   id       String      @id @default(cuid())
   gameId   String
@@ -106,7 +99,7 @@ model GameParticipant {
   user     User        @relation(fields: [userId], references: [id])
   joinedAt DateTime    @default(now())
 
-  @@unique([gameId, userId]) // can't join the same game twice
+  @@unique([gameId, userId])
 }
 
 model Booking {
