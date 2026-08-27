@@ -1,39 +1,27 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { prisma } from "../lib/prisma.js";
+import { GameSession } from "../models/GameSession.js";
 
 export async function listGames(req: Request, res: Response) {
   const sport = typeof req.query.sport === "string" ? req.query.sport : undefined;
+  const filter: Record<string, unknown> = { status: "open" };
+  if (sport) filter.sport = sport;
 
-  const games = await prisma.gameSession.findMany({
-    where: {
-      status: "open",
-      ...(sport ? { sport: sport as never } : {}),
-    },
-    include: {
-      host: { select: { id: true, name: true, avatarUrl: true, hearts: true } },
-      venue: true,
-      participants: {
-        include: { user: { select: { id: true, name: true, avatarUrl: true } } },
-      },
-    },
-    orderBy: { startsAt: "asc" },
-  });
+  const games = await GameSession.find(filter)
+    .sort({ startsAt: 1 })
+    .populate("hostId", "name avatarUrl hearts")
+    .populate("venueId")
+    .populate("participants.userId", "name avatarUrl");
 
   res.json(games);
 }
 
 export async function getGameById(req: Request, res: Response) {
-  const game = await prisma.gameSession.findUnique({
-    where: { id: req.params.id },
-    include: {
-      host: { select: { id: true, name: true, avatarUrl: true, hearts: true } },
-      venue: true,
-      participants: {
-        include: { user: { select: { id: true, name: true, avatarUrl: true } } },
-      },
-    },
-  });
+  const game = await GameSession.findById(req.params.id)
+    .populate("hostId", "name avatarUrl hearts")
+    .populate("venueId")
+    .populate("participants.userId", "name avatarUrl");
+
   if (!game) {
     return res.status(404).json({ error: "Game not found" });
   }
@@ -60,13 +48,11 @@ export async function createGame(req: Request, res: Response) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const game = await prisma.gameSession.create({
-    data: {
-      ...parsed.data,
-      startsAt: new Date(parsed.data.startsAt),
-      endsAt: new Date(parsed.data.endsAt),
-      hostId: req.localUser.id,
-    },
+  const game = await GameSession.create({
+    ...parsed.data,
+    startsAt: new Date(parsed.data.startsAt),
+    endsAt: new Date(parsed.data.endsAt),
+    hostId: req.localUser._id,
   });
 
   res.status(201).json(game);
@@ -76,56 +62,47 @@ export async function joinGame(req: Request, res: Response) {
   if (!req.localUser) {
     return res.status(401).json({ error: "Not authenticated" });
   }
-  const gameId = req.params.id;
 
-  // NOTE: this check-then-act on capacity has a benign race under heavy
-  // concurrent joins on the very last open slot (two people could both pass
-  // the capacity check a few ms apart before either insert completes).
-  // Low-risk at typical traffic; if it ever matters, wrap this in a
-  // `prisma.$transaction` with an explicit row lock, or add a DB-level
-  // constraint (e.g. a trigger that rejects inserts past capacity).
-  const game = await prisma.gameSession.findUnique({
-    where: { id: gameId },
-    include: { participants: true },
-  });
+  const game = await GameSession.findById(req.params.id);
   if (!game) {
     return res.status(404).json({ error: "Game not found" });
   }
   if (game.status !== "open") {
     return res.status(409).json({ error: "This game isn't open to new players" });
   }
+
+  const userId = req.localUser._id.toString();
+  const alreadyJoined = game.participants.some((p) => p.userId.toString() === userId);
+  if (alreadyJoined) {
+    return res.status(200).json(game);
+  }
   if (game.participants.length >= game.capacity) {
     return res.status(409).json({ error: "Game is already full" });
   }
 
-  const participant = await prisma.gameParticipant.upsert({
-    where: { gameId_userId: { gameId, userId: req.localUser.id } },
-    update: {},
-    create: { gameId, userId: req.localUser.id },
-  });
-
-  if (game.participants.length + 1 >= game.capacity) {
-    await prisma.gameSession.update({ where: { id: gameId }, data: { status: "full" } });
+  game.participants.push({ userId: req.localUser._id, joinedAt: new Date() } as never);
+  if (game.participants.length >= game.capacity) {
+    game.status = "full";
   }
+  await game.save();
 
-  res.status(201).json(participant);
+  res.status(201).json(game);
 }
 
 export async function leaveGame(req: Request, res: Response) {
   if (!req.localUser) {
     return res.status(401).json({ error: "Not authenticated" });
   }
-  const gameId = req.params.id;
 
-  await prisma.gameParticipant.deleteMany({
-    where: { gameId, userId: req.localUser.id },
-  });
+  const game = await GameSession.findById(req.params.id);
+  if (!game) {
+    return res.status(404).json({ error: "Game not found" });
+  }
 
-  // Reopen the game if leaving frees up a slot in a previously-full game.
-  await prisma.gameSession.updateMany({
-    where: { id: gameId, status: "full" },
-    data: { status: "open" },
-  });
+  const userId = req.localUser._id.toString();
+  game.participants = game.participants.filter((p) => p.userId.toString() !== userId) as never;
+  if (game.status === "full") game.status = "open";
+  await game.save();
 
   res.status(204).send();
 }

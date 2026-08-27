@@ -1,8 +1,14 @@
 import "dotenv/config";
 import app from "./app.js";
+import { connectDB } from "./db.js";
 
 const port = process.env.PORT ? Number(process.env.PORT) : 4000;
 
-app.listen(port, () => {
-  console.log(`API listening on http://localhost:${port}`);
-});
+connectDB()
+  .then(() => {
+    app.listen(port, () => console.log(`API listening on http://localhost:${port}`));
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB:", err);
+    process.exit(1);
+  });

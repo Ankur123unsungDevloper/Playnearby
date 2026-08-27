@@ -1,118 +1,92 @@
-# PlayNearby API
+# PlayNearby API — MongoDB + Mongoose
 
-Express + PostgreSQL (via Prisma) + Clerk auth.
+This is a complete server folder, not a patch. Nothing carries over from
+Prisma/Kysely/Convex — no residual files from those needed.
 
-## 1. Install & configure
+## 1. Replace your server folder
 
-```bash
+**Back up or delete your current `server` folder entirely**, then copy this
+whole folder in its place, renamed to `server`.
+
+## 2. Get a MongoDB database — recommended: Atlas (free, no local install)
+
+Given everything that went wrong with local Postgres on Windows, I'd
+strongly suggest **not** installing MongoDB locally this time:
+
+1. Go to https://cloud.mongodb.com, sign up free.
+2. Create a free "M0" cluster (no credit card needed).
+3. **Database Access** → add a database user (username + password — write
+   these down).
+4. **Network Access** → add IP address → "Allow access from anywhere" (fine
+   for development).
+5. **Database** → **Connect** → **Drivers** → copy the connection string. It
+   looks like `mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/...`
+6. Replace `<user>` and `<password>` with what you set in step 3.
+
+If you'd genuinely rather run MongoDB locally, install **MongoDB Community
+Server**, and your connection string is just `mongodb://localhost:27017/playnearby`
+— no separate `mongosh`/permission-granting dance like Postgres needed; a
+local MongoDB just accepts a database name in the URL and creates it
+automatically the first time you write to it.
+
+## 3. Install and configure
+
+```powershell
 npm install
 cp .env.example .env
 ```
 
-Fill in `.env`:
-- `DATABASE_URL` — your Postgres connection string (local Postgres, or a free
-  Neon/Supabase/Railway instance work fine to start).
-- `CLERK_SECRET_KEY` / `CLERK_PUBLISHABLE_KEY` — from your Clerk dashboard's
-  API Keys page. **Use the same Clerk application** your Next.js frontend is
-  already using — same project, same keys — not a separate one, or tokens
-  issued by the frontend won't verify against this backend.
-- `CLERK_WEBHOOK_SECRET` — see step 3.
+Fill in `.env`: your `MONGODB_URI` from step 2, and your Clerk keys (same
+ones from before — Clerk itself didn't change).
 
-## 2. Create the database schema
+## 4. Seed some data
 
-```bash
-npm run prisma:migrate
+```powershell
+npm run seed
 ```
 
-This creates the tables from `prisma/schema.prisma` and generates the
-type-safe Prisma client. Re-run this any time you edit the schema.
+## 5. Run it
 
-Optional: `npm run prisma:studio` opens a GUI to browse/edit rows directly.
-
-## 3. Wire up the Clerk webhook (keeps Postgres in sync with Clerk)
-
-Clerk owns your users' identity (email, password, sessions) — this backend
-never sees a password. It only needs to know a user *exists* so it can attach
-app-specific data to them (hearts, hosted games, bookings).
-
-1. Run the server (`npm run dev`) and expose it publicly for testing —
-   easiest is `npx ngrok http 4000` (or deploy it somewhere reachable).
-2. In the Clerk dashboard: **Webhooks → Add Endpoint**.
-   - URL: `https://<your-public-url>/api/webhooks/clerk`
-   - Subscribe to: `user.created`, `user.updated`, `user.deleted`
-3. Copy the **Signing Secret** Clerk gives you into `CLERK_WEBHOOK_SECRET`.
-
-Now every signup on the frontend automatically creates a matching row in your
-`User` table within moments.
-
-## 4. Run it
-
-```bash
+```powershell
 npm run dev
 ```
 
-API is live at `http://localhost:4000`. Check `GET /api/health` first.
+Check `http://localhost:4000/api/health`, then `http://localhost:4000/api/games`
+and `http://localhost:4000/api/venues`.
 
-## 5. Connecting from the Next.js frontend
+## 6. Clerk webhook
 
-This is the part that's easy to get wrong: your frontend and this API are
-**two separate servers**, so Clerk's session isn't automatically "known" to
-Express — the frontend has to explicitly attach the session token to every
-request.
+Same as before — Clerk dashboard → Webhooks → point at
+`https://<your-public-url>/api/webhooks/clerk`, subscribe to
+`user.created`/`user.updated`/`user.deleted`, copy the signing secret into
+`CLERK_WEBHOOK_SECRET`.
 
-In a Next.js Server Component or Route Handler:
+## What's different from the Postgres versions
 
-```ts
-import { auth } from "@clerk/nextjs/server";
+- **No migrations.** MongoDB doesn't require a schema-change step to add a
+  field — Mongoose schemas describe what your *application* expects, not
+  a rigid table structure the database enforces. Add a field to a model
+  file, restart, done.
+- **No separate join table** for who's playing a game — `GameSession`
+  documents embed their `participants` array directly. Fewer files, fewer
+  concepts, one collection instead of two.
+- **`.populate()`** replaces the manual "fetch main rows, fetch related
+  rows, assemble in JS" pattern from the Kysely/plain-SQL versions —
+  Mongoose does that stitching for you when you ask for related documents.
 
-const { getToken } = await auth();
-const token = await getToken();
+## API surface
 
-const res = await fetch("http://localhost:4000/api/games", {
-  headers: { Authorization: `Bearer ${token}` },
-});
-```
-
-In a Client Component:
-
-```ts
-"use client";
-import { useAuth } from "@clerk/nextjs";
-
-const { getToken } = useAuth();
-
-async function createGame(payload: object) {
-  const token = await getToken();
-  return fetch("http://localhost:4000/api/games", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  });
-}
-```
-
-`@clerk/express`'s `clerkMiddleware()` (already wired up in `app.ts`) reads
-that header and verifies it against Clerk's public keys automatically — no
-manual JWT code needed on this end. Routes that call `requireAuth()` will
-403 if the header is missing or invalid.
-
-## What's scaffolded vs. what's next
-
-**Done:**
-- `GET /api/venues/nearby?lat=&lng=&radiusKm=` — powers Heroes.tsx's map,
-  same haversine math the frontend already does, just server-side over real data.
-- `GET /api/venues`, `GET /api/venues/:id`
-- `GET /api/games`, `GET /api/games/:id`, `POST /api/games` (host a game),
-  `POST /api/games/:id/join`, `DELETE /api/games/:id/join`
+- `GET /api/venues`, `GET /api/venues/nearby`, `GET /api/venues/:id`, `POST /api/venues`
+- `GET /api/games`, `GET /api/games/:id`, `POST /api/games`, `POST /api/games/:id/join`, `DELETE /api/games/:id/join`
+- `POST /api/play-requests`, `GET /api/play-requests`, `POST /api/play-requests/:id/respond`, `POST /api/play-requests/:id/cancel`
+- `GET /api/communities`, `POST /api/communities`, `POST /api/communities/:id/join`
 - `GET /api/sports`
-- Clerk auth wired end-to-end, with Postgres user sync via webhook
 
-**Not built yet — natural next steps:**
-- Venue booking flow (`Booking` model exists in the schema, no routes yet)
-- Blog CRUD (`Blog` model exists, no routes yet — needed for Blogs.tsx)
-- Image uploads (venue photos, avatars) — likely S3/Cloudinary + presigned URLs
-- Rate limiting on write routes (`POST /api/games`, join/leave)
-- Tests
+Your frontend's `lib/api.ts` and existing components don't need to change —
+same URLs, same response shapes as the Postgres versions had.
+
+## Not built yet, on purpose
+
+No frontend pages for Play Requests or Communities. No map integration.
+Both are real, separate pieces of work — see the note about the map API in
+the chat response, and say the word on which page to build next.

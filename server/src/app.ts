@@ -8,6 +8,8 @@ import venuesRouter from "./routes/venues.routes.js";
 import gamesRouter from "./routes/games.routes.js";
 import sportsRouter from "./routes/sports.routes.js";
 import webhooksRouter from "./routes/webhooks.routes.js";
+import playRequestsRouter from "./routes/play-requests.routes.js";
+import communitiesRouter from "./routes/communities.routes.js";
 import { errorHandler } from "./middleware/error-handler.js";
 
 const app = express();
@@ -21,23 +23,19 @@ app.use(
 );
 app.use(morgan("dev"));
 
-// Webhooks are mounted BEFORE express.json(), because Clerk's signature
-// verification (svix) needs the raw, unparsed request body. Everything else
-// mounted after express.json() gets a normal parsed req.body as usual.
+// Webhooks mounted before express.json() — Clerk's signature check needs the raw body.
 app.use("/api/webhooks", webhooksRouter);
 
 app.use(express.json());
-app.use(
-  clerkMiddleware({
-    publishableKey: "pk_test_Y29tcG9zZWQtc3R1cmdlb24tOTQuY2xlcmsuYWNjb3VudHMuZGV2JA",
-  }),
-);
+app.use(clerkMiddleware());
 
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
 app.use("/api/venues", venuesRouter);
 app.use("/api/games", gamesRouter);
 app.use("/api/sports", sportsRouter);
+app.use("/api/play-requests", playRequestsRouter);
+app.use("/api/communities", communitiesRouter);
 
 app.use(errorHandler);
 

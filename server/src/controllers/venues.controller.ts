@@ -1,13 +1,21 @@
 import type { Request, Response } from "express";
-import { prisma } from "../lib/prisma.js";
+import { z } from "zod";
+import { Venue } from "../models/Venue.js";
 
-// Same haversine approach the frontend's Heroes.tsx uses client-side for
-// projecting pins onto the map — done here in SQL so we only pull venues
-// actually within range instead of loading the whole table into memory.
-//
-// This needs no PostGIS extension, just plain math — fine at this scale.
-// If the venues table grows into the tens of thousands of rows, revisit
-// with PostGIS + a proper spatial index.
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Distance computed in JS after fetching, rather than a MongoDB geospatial
+// index — simplest option, plenty fast at this project's scale. Revisit
+// with a real 2dsphere index if the venues table ever grows into the
+// thousands of rows.
 export async function getNearbyVenues(req: Request, res: Response) {
   const lat = Number(req.query.lat);
   const lng = Number(req.query.lng);
@@ -17,40 +25,47 @@ export async function getNearbyVenues(req: Request, res: Response) {
     return res.status(400).json({ error: "lat and lng query params are required" });
   }
 
-  const venues = await prisma.$queryRaw`
-    SELECT * FROM (
-      SELECT *,
-        (
-          6371 * acos(
-            cos(radians(${lat})) * cos(radians(latitude)) *
-            cos(radians(longitude) - radians(${lng})) +
-            sin(radians(${lat})) * sin(radians(latitude))
-          )
-        ) AS "distanceKm"
-      FROM "Venue"
-    ) sub
-    WHERE "distanceKm" <= ${radiusKm}
-    ORDER BY "distanceKm" ASC
-  `;
+  const venues = await Venue.find().lean();
+  const withDistance = venues
+    .map((v) => ({ ...v, distanceKm: haversineKm(lat, lng, v.latitude, v.longitude) }))
+    .filter((v) => v.distanceKm <= radiusKm)
+    .sort((a, b) => a.distanceKm - b.distanceKm);
 
-  res.json(venues);
+  res.json(withDistance);
 }
 
 export async function listVenues(req: Request, res: Response) {
   const sport = typeof req.query.sport === "string" ? req.query.sport : undefined;
-
-  const venues = await prisma.venue.findMany({
-    where: sport ? { sports: { has: sport as never } } : undefined,
-    orderBy: [{ featured: "desc" }, { rating: "desc" }],
-  });
-
+  const filter = sport ? { sports: sport } : {};
+  const venues = await Venue.find(filter).sort({ featured: -1, rating: -1 });
   res.json(venues);
 }
 
 export async function getVenueById(req: Request, res: Response) {
-  const venue = await prisma.venue.findUnique({ where: { id: req.params.id } });
+  const venue = await Venue.findById(req.params.id);
   if (!venue) {
     return res.status(404).json({ error: "Venue not found" });
   }
   res.json(venue);
+}
+
+const createVenueSchema = z.object({
+  name: z.string().min(1),
+  address: z.string().min(1),
+  latitude: z.number(),
+  longitude: z.number(),
+  rating: z.number().min(0).max(5).default(0),
+  reviewCount: z.number().int().min(0).default(0),
+  featured: z.boolean().default(false),
+  images: z.array(z.string()).default([]),
+  sports: z.array(z.string()).min(1),
+});
+
+export async function createVenue(req: Request, res: Response) {
+  const parsed = createVenueSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+  const venue = await Venue.create(parsed.data);
+  res.status(201).json(venue);
 }
