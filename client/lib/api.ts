@@ -1,4 +1,4 @@
-import type { GameSession, Venue } from "@/types";
+import type { GameSession, PlayerSummary, Venue } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -6,10 +6,6 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: { "Content-Type": "application/json", ...init?.headers },
-    // Games/venues change often (new hosts, people joining, slots filling) —
-    // no-store keeps list/detail pages honest rather than serving stale data
-    // from Next's default fetch cache. Revisit with real revalidation
-    // (tags + revalidatePath on write routes) once traffic makes this matter.
     cache: "no-store",
   });
 
@@ -21,28 +17,93 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export function getVenues(params?: { sport?: SportKeyLike }) {
+/* ------------------------------------------------------------------ */
+/*  Normalizers — MongoDB documents come back with `_id`, and populated
+/*  references keep their field name (`hostId`, `venueId`) even though
+/*  they now hold a full object, not just a string. Everything else in
+/*  the frontend expects `id`, `host`, `venue` — normalize once, here,
+/*  instead of touching every component that consumes this data.       */
+/* ------------------------------------------------------------------ */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Raw = any;
+
+function normalizePlayer(raw: Raw): PlayerSummary | null {
+  if (!raw) return null;
+  return {
+    id: raw._id ?? raw.id,
+    name: raw.name,
+    avatarUrl: raw.avatarUrl ?? null,
+    hearts: raw.hearts,
+  };
+}
+
+function normalizeVenue(raw: Raw): Venue {
+  return {
+    id: raw._id ?? raw.id,
+    name: raw.name,
+    address: raw.address,
+    latitude: raw.latitude,
+    longitude: raw.longitude,
+    rating: raw.rating,
+    reviewCount: raw.reviewCount,
+    featured: raw.featured,
+    images: raw.images ?? [],
+    sports: raw.sports ?? [],
+    createdAt: raw.createdAt,
+    distanceKm: raw.distanceKm,
+  };
+}
+
+function normalizeGame(raw: Raw): GameSession {
+  return {
+    id: raw._id ?? raw.id,
+    sport: raw.sport,
+    format: raw.format,
+    level: raw.level,
+    stateTag: raw.stateTag ?? null,
+    startsAt: raw.startsAt,
+    endsAt: raw.endsAt,
+    capacity: raw.capacity,
+    status: raw.status,
+    host: normalizePlayer(raw.hostId ?? raw.host) as PlayerSummary,
+    venue: raw.venueId || raw.venue ? normalizeVenue(raw.venueId ?? raw.venue) : null,
+    participants: (raw.participants ?? []).map((p: Raw) => ({
+      id: p._id ?? p.id,
+      joinedAt: p.joinedAt,
+      user: normalizePlayer(p.userId ?? p.user) as PlayerSummary,
+    })),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/*  Public API — same function signatures as before, so nothing else   */
+/*  in the app needs to change.                                        */
+/* ------------------------------------------------------------------ */
+
+export async function getVenues(params?: { sport?: string }) {
   const qs = params?.sport ? `?sport=${encodeURIComponent(params.sport)}` : "";
-  return apiFetch<Venue[]>(`/api/venues${qs}`);
+  const raw = await apiFetch<Raw[]>(`/api/venues${qs}`);
+  return raw.map(normalizeVenue);
 }
 
-export function getNearbyVenues(lat: number, lng: number, radiusKm = 8) {
-  return apiFetch<Venue[]>(`/api/venues/nearby?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`);
+export async function getNearbyVenues(lat: number, lng: number, radiusKm = 8) {
+  const raw = await apiFetch<Raw[]>(`/api/venues/nearby?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`);
+  return raw.map(normalizeVenue);
 }
 
-export function getVenueById(id: string) {
-  return apiFetch<Venue>(`/api/venues/${id}`);
+export async function getVenueById(id: string) {
+  const raw = await apiFetch<Raw>(`/api/venues/${id}`);
+  return normalizeVenue(raw);
 }
 
-export function getGames(params?: { sport?: SportKeyLike }) {
+export async function getGames(params?: { sport?: string }) {
   const qs = params?.sport ? `?sport=${encodeURIComponent(params.sport)}` : "";
-  return apiFetch<GameSession[]>(`/api/games${qs}`);
+  const raw = await apiFetch<Raw[]>(`/api/games${qs}`);
+  return raw.map(normalizeGame);
 }
 
-export function getGameById(id: string) {
-  return apiFetch<GameSession>(`/api/games/${id}`);
+export async function getGameById(id: string) {
+  const raw = await apiFetch<Raw>(`/api/games/${id}`);
+  return normalizeGame(raw);
 }
-
-// Loosely typed so callers can pass a plain string (e.g. from a URL query
-// param) without fighting the SportKey union at the call site.
-type SportKeyLike = string;
