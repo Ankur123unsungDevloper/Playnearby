@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton, SignInButton } from "@clerk/nextjs";
 import { GiShuttlecock } from "react-icons/gi";
 
 const NAV_LINKS = [

@@ -84,7 +84,7 @@ export function GameCard({ game }: { game: GameSession }) {
     >
       <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-      <div className="pointer-events-none absolute -bottom-4 -left-4 text-7xl text-white/15 transition-all duration-500 group-hover:scale-110 group-hover:text-white/25">
+      <div className="pointer-events-none absolute bottom-4 left-4 text-7xl text-white/15 transition-all duration-500 group-hover:scale-110 group-hover:text-white/25">
         {SPORT_ICONS[game.sport]}
       </div>
 
@@ -105,7 +105,7 @@ export function GameCard({ game }: { game: GameSession }) {
           </span>
         </div>
 
-        <div className="relative bottom-10 flex w-full flex-col gap-2 pr-16">
+        <div className="relative bottom-10 flex w-full flex-col gap-2 pr-1">
           <div className="flex w-full items-center justify-between gap-2">
             <AvatarGroup host={game.host} joined={joinedUsers} />
             <StatusBadge variant={status.variant} text={status.text} />
