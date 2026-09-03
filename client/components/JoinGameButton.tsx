@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth, SignInButton } from "@clerk/nextjs";
+import { Button } from "./ui/button";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -14,33 +15,33 @@ export function JoinGameButton({ gameId, isFull }: { gameId: string; isFull: boo
 
   if (isFull) {
     return (
-      <button
+      <Button
         disabled
         className="w-full cursor-not-allowed rounded-full bg-gray-200 py-3 text-sm font-bold text-gray-500"
       >
         Game Full
-      </button>
+      </Button>
     );
   }
 
   if (!isSignedIn) {
     return (
       <SignInButton mode="modal">
-        <button className="w-full rounded-full bg-primary py-3 text-sm font-bold text-white shadow-md transition-transform duration-300 hover:scale-[1.02]">
+        <Button className="w-full">
           Sign in to Join
-        </button>
+        </Button>
       </SignInButton>
     );
   }
 
   if (status === "joined") {
     return (
-      <button
+      <Button
         disabled
         className="w-full cursor-default rounded-full bg-primary/60 py-3 text-sm font-bold text-white"
       >
         You&apos;re In 🎉
-      </button>
+      </Button>
     );
   }
 
@@ -66,13 +67,13 @@ export function JoinGameButton({ gameId, isFull }: { gameId: string; isFull: boo
 
   return (
     <div className="flex flex-col gap-2">
-      <button
+      <Button
         onClick={handleJoin}
         disabled={status === "loading"}
-        className="w-full rounded-full bg-primary py-3 text-sm font-bold text-white shadow-md transition-transform duration-300 hover:scale-[1.02] disabled:opacity-60"
+        className="w-full h-10 rounded-lg bg-primary py-3 text-lg font-bold text-white shadow-md transition-transform duration-300 hover:scale-[1.02] disabled:opacity-60"
       >
         {status === "loading" ? "Joining..." : "Join This Game"}
-      </button>
+      </Button>
       {status === "error" && (
         <p className="text-center text-xs font-medium text-red-500">{errorMessage}</p>
       )}
