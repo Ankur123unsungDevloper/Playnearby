@@ -1,19 +1,33 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage
+} from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Show, useClerk, useUser } from "@clerk/nextjs";
-import { LayoutDashboard, LogOut, User } from "lucide-react";
+
+import {
+  Show,
+  useClerk,
+  useUser
+} from "@clerk/nextjs";
+
+import {
+  LogOut,
+  User
+} from "lucide-react";
+import { FaHandsHelping } from "react-icons/fa";
 
 function getInitials(name?: string | null) {
   if (!name) return "U";
@@ -68,27 +82,23 @@ export default function ActionButton() {
               </Avatar>
             </button>
           </DropdownMenuTrigger>
-
           <DropdownMenuContent align="end" sideOffset={8} className="w-52">
-            <DropdownMenuLabel className="truncate font-normal text-muted-foreground">
-              {user?.fullName ?? user?.primaryEmailAddress?.emailAddress}
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/profile" className="cursor-pointer">
+              <Link href="/profile" className="cursor-pointer bg-background text-on_background group flex w-full font-semibold border-none items-center px-6 py-3 mt-3 text-sm hover:bg-surface">
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/dashboard" className="cursor-pointer">
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                Dashboard
+              <Link href="/help&support" className="cursor-pointer bg-background text-on_background group flex w-full font-semibold border-none items-center px-6 py-3 mt-3 text-sm hover:bg-surface">
+                <FaHandsHelping className="mr-2 h-4 w-4" />
+                Help & Support
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600"
+              className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600 group flex w-full font-semibold border-none items-center px-6 py-3 mt-3 text-sm hover:bg-surface"
               onClick={() => signOut(() => router.push("/"))}
             >
               <LogOut className="mr-2 h-4 w-4" />

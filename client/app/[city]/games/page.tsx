@@ -1,14 +1,11 @@
 import Link from "next/link";
 
 import { getGames } from "@/lib/api";
-import { SPORT_LABELS } from "@/lib/sport-meta";
 import { cityLabel } from "@/lib/geocode";
 
 import { GameCard } from "@/components/GameCard";
 import { AppNavbar } from "@/components/AppNavbar";
 import { AppFooter } from "@/components/AppFooter";
-
-import type { SportKey } from "@/types";
 
 
 export default async function CityGamesPage({
@@ -31,29 +28,25 @@ export default async function CityGamesPage({
     <div className="flex min-h-screen flex-col bg-gray-50">
       <AppNavbar />
 
-      <div className="w-full flex flex-row bg-primary py-10 text-white">
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-2 px-4 sm:px-6 items-center justify-center">
-          <h1 className="text-3xl font-extrabold sm:text-4xl">Games in {cityLabel(city)}</h1>
-          <p className="max-w-xl text-white/85">Pick a sport, pick a time, show up and play.</p>
+      <div className="w-full flex flex-row bg-primary py-4 text-white">
+        <div className="flex w-full max-w-7xl items-center justify-center gap-4 px-4 sm:px-6">
+          <div className="flex w-full flex-col gap-2 px-4 sm:px-6 items-center justify-center">
+            <h1 className="text-3xl font-extrabold sm:text-4xl">Games in {cityLabel(city)}</h1>
+            <p className="max-w-xl text-white/85">Pick a sport, pick a time, show up and play.</p>
+          </div>
+          <div className="flex w-full flex-row gap-2 px-2 sm:px-4 items-center justify-end">
+            <Link
+              href="/games/create"
+              className="rounded-xl w-40 h-10 items-center justify-center bg-[#78f19080] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-transform duration-300 hover:scale-[1.02]"
+            >
+              + Host a Game
+            </Link>
+          </div>
         </div>
-        <div className="mx-auto flex w-full flex-row gap-2 px-2 sm:px-4 items-center justify-center">
-          <Link
-            href="/games/create"
-            className="rounded-xl w-40 h-10 items-center justify-center bg-[#78f19080] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-transform duration-300 hover:scale-[1.02]"
-          >
-            + Host a Game
-          </Link>
-        </div>
+        
       </div>
 
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-10 sm:px-6">
-
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-gray-800">
-            {sport ? SPORT_LABELS[sport as SportKey] : "All"} Games
-          </h2>
-        </div>
-
         {games.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-3xl bg-white py-20 text-center shadow-sm">
             <p className="text-gray-500">No open games right now — be the first to host one.</p>
