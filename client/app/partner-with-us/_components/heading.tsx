@@ -8,7 +8,7 @@ const Heading = () => {
     >
       {/* Content */}
       <div className="relative z-10 w-full h-full space-y-4 text-primary text-start px-30">
-        <div className="space-y-40 max-w-3xl">
+        <div className="space-y-30 max-w-3xl">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-50">
             Turn Empty Courts Into <br />
             Full Ones
