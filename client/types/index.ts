@@ -8,10 +8,13 @@ export type SportKey =
   | "tennis"
   | "table_tennis";
 
+export type VenueStatus = "pending" | "approved" | "rejected";
+
 export type Venue = {
   id: string;
   name: string;
-  address: string;
+  fullAddress: string;
+  address: string; // short/display address
   latitude: number;
   longitude: number;
   rating: number;
@@ -19,6 +22,13 @@ export type Venue = {
   featured: boolean;
   images: string[];
   sports: SportKey[];
+  amenities: string[];
+  description: string;
+  otherVenuesOwned?: string;
+  openTime: string; // "09:00"
+  closeTime: string; // "22:00"
+  ownerId?: string;
+  status?: VenueStatus;
   createdAt: string;
   // Only present when returned from /api/venues/nearby
   distanceKm?: number;

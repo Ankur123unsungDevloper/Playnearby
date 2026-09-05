@@ -17,3 +17,13 @@ export async function detectCitySlug(lat: number, lng: number): Promise<string> 
   const data = await res.json();
   return citySlug(data.city);
 }
+// Add this function to your existing lib/geocode.ts (alongside citySlug,
+// cityLabel, detectCitySlug — don't remove those).
+
+export async function detectCoordinatesFromAddress(
+  address: string,
+): Promise<{ latitude: number; longitude: number }> {
+  const res = await fetch(`/api/geocode-address?address=${encodeURIComponent(address)}`);
+  if (!res.ok) throw new Error("Could not find coordinates for this address");
+  return res.json();
+}

@@ -12,10 +12,6 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// Distance computed in JS after fetching, rather than a MongoDB geospatial
-// index — simplest option, plenty fast at this project's scale. Revisit
-// with a real 2dsphere index if the venues table ever grows into the
-// thousands of rows.
 export async function getNearbyVenues(req: Request, res: Response) {
   const lat = Number(req.query.lat);
   const lng = Number(req.query.lng);
@@ -51,14 +47,17 @@ export async function getVenueById(req: Request, res: Response) {
 
 const createVenueSchema = z.object({
   name: z.string().min(1),
-  address: z.string().min(1),
+  fullAddress: z.string().min(1),
+  address: z.string().min(1), // short/display address
   latitude: z.number(),
   longitude: z.number(),
-  rating: z.number().min(0).max(5).default(0),
-  reviewCount: z.number().int().min(0).default(0),
-  featured: z.boolean().default(false),
   images: z.array(z.string()).default([]),
   sports: z.array(z.string()).min(1),
+  amenities: z.array(z.string()).default([]),
+  description: z.string().min(1),
+  otherVenuesOwned: z.string().optional(),
+  openTime: z.string().min(1),
+  closeTime: z.string().min(1),
 });
 
 export async function createVenue(req: Request, res: Response) {
@@ -66,6 +65,14 @@ export async function createVenue(req: Request, res: Response) {
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
-  const venue = await Venue.create(parsed.data);
+  if (!req.localUser) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const venue = await Venue.create({
+    ...parsed.data,
+    ownerId: req.localUser._id,
+  });
+
   res.status(201).json(venue);
 }

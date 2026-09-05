@@ -17,14 +17,6 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Normalizers — MongoDB documents come back with `_id`, and populated
-/*  references keep their field name (`hostId`, `venueId`) even though
-/*  they now hold a full object, not just a string. Everything else in
-/*  the frontend expects `id`, `host`, `venue` — normalize once, here,
-/*  instead of touching every component that consumes this data.       */
-/* ------------------------------------------------------------------ */
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Raw = any;
 
@@ -42,6 +34,7 @@ function normalizeVenue(raw: Raw): Venue {
   return {
     id: raw._id ?? raw.id,
     name: raw.name,
+    fullAddress: raw.fullAddress ?? raw.address,
     address: raw.address,
     latitude: raw.latitude,
     longitude: raw.longitude,
@@ -50,6 +43,13 @@ function normalizeVenue(raw: Raw): Venue {
     featured: raw.featured,
     images: raw.images ?? [],
     sports: raw.sports ?? [],
+    amenities: raw.amenities ?? [],
+    description: raw.description ?? "",
+    otherVenuesOwned: raw.otherVenuesOwned,
+    openTime: raw.openTime ?? "09:00",
+    closeTime: raw.closeTime ?? "22:00",
+    ownerId: raw.ownerId,
+    status: raw.status,
     createdAt: raw.createdAt,
     distanceKm: raw.distanceKm,
   };
@@ -75,11 +75,6 @@ function normalizeGame(raw: Raw): GameSession {
     })),
   };
 }
-
-/* ------------------------------------------------------------------ */
-/*  Public API — same function signatures as before, so nothing else   */
-/*  in the app needs to change.                                        */
-/* ------------------------------------------------------------------ */
 
 export async function getVenues(params?: { sport?: string }) {
   const qs = params?.sport ? `?sport=${encodeURIComponent(params.sport)}` : "";
