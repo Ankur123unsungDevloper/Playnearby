@@ -23,7 +23,7 @@ const VALUE_PROPS = [
     icon: <MdGroups className="h-30 w-30 text-white" />,
     title: "Reach more players",
     body: "Your venue shows up to nearby players actively looking for a place to play, not just people who already knew you existed.",
-    link: "/reach-palyers",
+    link: "/reach-players",
   },
   {
     icon: <MdEventAvailable className="h-30 w-30 text-white" />,
@@ -64,7 +64,10 @@ const Hero = () => {
               </CardDescription>
             </CardHeader>
             <CardFooter>
-              <Button className="w-full h-10 shadow-md hover:shadow-lg transition-shadow">
+              <Button
+                asChild
+                className="w-full h-10 shadow-md hover:shadow-lg transition-shadow"
+              >
                 <Link href={v.link} className="w-full">
                   Know More
                 </Link>

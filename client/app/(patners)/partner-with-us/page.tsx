@@ -1,7 +1,7 @@
-import { Navbar } from "./_components/navbar/page";
-import Heading from "./_components/heading";
-import Hero from "./_components/hero";
-import { Footer } from "./_components/footer/page";
+import { Navbar } from "../_components/navbar/page";
+import Heading from "../_components/heading";
+import Hero from "../_components/hero";
+import { Footer } from "../_components/footer/page";
 
 export default function PartnerWithUsPage() {
   return (
