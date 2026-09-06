@@ -8,7 +8,21 @@ import Logo from "@/components/logo";
 import ActionButton from "./_components/actionbutton";
 import Search from "./_components/search";
 
+import Link from "next/link";
+import {
+  usePathname
+} from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { FaUserFriends } from "react-icons/fa";
+
+const NAV_LINKS = [
+  { href: "/games", label: "Games" },
+  { href: "/venues", label: "Venues" },
+  { href: "/communities", label: "Communities" },
+];
+
 const Navbar = () => {
+  const pathname = usePathname();
   const scrolled = useScrollTop();
   const searchScrolled = useHeadingSearchScrolled();
 
@@ -19,23 +33,46 @@ const Navbar = () => {
         scrolled && "border-b shadow-sm"
       )}
     >
-      {/* Left: logo, fixed size, never shrinks */}
-      <div className="flex-none">
-        <Logo />
+      <div className="flex items-center xl:min-w-100 md:justify-start w-[35%] xl:w-[25%] min-w-0">
+        <div className="flex-none">
+          <Logo />
+        </div>
+        <div
+          className={cn(
+            "flex-1 flex justify-center overflow-hidden px-4 transition-all duration-700 ease-[cubic-bezier(.22,1,.36,1)]",
+            searchScrolled ? "opacity-100" : "opacity-0 pointer-events-none"
+          )}
+        >
+          <Search />
+        </div>
       </div>
-
-      {/* Center: search, fades in on scroll, ignores clicks while hidden */}
-      <div
-        className={cn(
-          "flex-1 flex justify-center overflow-hidden px-4 transition-all duration-700 ease-[cubic-bezier(.22,1,.36,1)]",
-          searchScrolled ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}
-      >
-        <Search />
-      </div>
-
-      {/* Right: auth buttons / avatar, fixed size, never shrinks */}
-      <div className="flex-none flex items-center gap-x-2">
+      <nav className="hidden items-center gap-1 md:flex uppercase text-xl font-semibold">
+        {NAV_LINKS.map((link) => {
+          const active = pathname?.startsWith(link.href);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`rounded-full px-4 py-2 transition-colors ${
+                active ? "bg-primary/10 text-primary" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              }`}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
+      </nav>
+      <div className="flex flex-row items-center gap-3">
+        <Button
+          variant="ghost"
+          className=""
+          asChild
+        >
+          <Link href="/partner-with-us" className="flex flex-col lg:flex-row items-center cursor-pointer">
+            <FaUserFriends className="size-8 m-auto shrink-0" />
+            <span className="ml-2 uppercase text-xl font-semibold tracking-[10%] whitespace-nowrap text-main">Partner</span>
+          </Link>
+        </Button>
         <ActionButton />
       </div>
     </div>

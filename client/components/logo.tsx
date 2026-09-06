@@ -8,8 +8,8 @@ export default function Logo() {
         <Image
           src="/light_logo.svg"
           alt="Logo"
-          width={260}
-          height={200}
+          width={180}
+          height={160}
         />
       </Link>
     </div>

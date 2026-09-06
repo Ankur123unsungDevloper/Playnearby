@@ -4,8 +4,6 @@ import { getGames } from "@/lib/api";
 import { cityLabel } from "@/lib/geocode";
 
 import { GameCard } from "@/components/GameCard";
-import { AppNavbar } from "@/components/AppNavbar";
-import { AppFooter } from "@/components/AppFooter";
 
 
 export default async function CityGamesPage({
@@ -25,9 +23,7 @@ export default async function CityGamesPage({
   const games = await getGames({ sport });
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      <AppNavbar />
-
+    <div className="flex mt-15 flex-col bg-gray-50">
       <div className="w-full flex flex-row bg-primary py-4 text-white">
         <div className="flex w-full max-w-7xl items-center justify-center gap-4 px-4 sm:px-6">
           <div className="flex w-full flex-col gap-2 px-4 sm:px-6 items-center justify-center">
@@ -62,8 +58,6 @@ export default async function CityGamesPage({
           </div>
         )}
       </main>
-
-      <AppFooter />
     </div>
   );
 }

@@ -2,15 +2,12 @@
 
 import Link from "next/link";
 import { useCityRedirect } from "@/hooks/use-city-redirect";
-import { AppNavbar } from "@/components/AppNavbar";
-import { AppFooter } from "@/components/AppFooter";
 
 export default function GamesLocationGate() {
   const message = useCityRedirect("/games");
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      <AppNavbar />
+    <div className="flex mt-15 flex-col bg-gray-50">
       <div className="flex flex-1 flex-col items-center justify-center gap-4">
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
@@ -21,7 +18,6 @@ export default function GamesLocationGate() {
           Skip and browse Mumbai instead
         </Link>
       </div>
-      <AppFooter />
     </div>
   );
 }

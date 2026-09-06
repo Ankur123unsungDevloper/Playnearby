@@ -3,12 +3,20 @@
 
 import Link from "next/link";
 import Image from "next/image";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import { useHeadingSearchScrolled } from "@/hooks/use-heading-search-scrolled";
 import { useSearchQuery } from "@/hooks/use-search-query";
+
 import { cn } from "@/lib/utils";
-import { FaMapMarkerAlt, FaStar, FaPlay } from "react-icons/fa";
+
+import {
+  FaMapMarkerAlt,
+  FaStar,
+  FaPlay
+} from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
 
 const avatarSeeds = [12, 32, 47, 5, 22, 18];
@@ -31,20 +39,14 @@ const Heading = () => {
         @keyframes blobDrift { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(20px, -15px) scale(1.05); } }
         .fade-up { opacity: 0; animation: fadeUp 0.7s ease forwards; }
       `}</style>
-
-      {/* Playful pastel blobs instead of a flat single-color field */}
       <div className="pointer-events-none absolute -left-20 top-10 h-80 w-80 rounded-full bg-[#78F190]/50 blur-[70px] animate-[blobDrift_9s_ease-in-out_infinite]" />
       <div className="pointer-events-none absolute -right-16 top-40 h-72 w-72 rounded-full bg-[#FFE29A]/60 blur-[70px] animate-[blobDrift_11s_ease-in-out_infinite]" style={{ animationDelay: "1s" }} />
       <div className="pointer-events-none absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-[#C5E8FF]/60 blur-[70px] animate-[blobDrift_10s_ease-in-out_infinite]" style={{ animationDelay: "2s" }} />
 
-      {/* Little scattered doodle marks for texture */}
       <span className="pointer-events-none absolute left-[8%] top-[14%] text-2xl text-primary/40">✦</span>
       <span className="pointer-events-none absolute left-[46%] top-[8%] text-lg text-[#FFB84D]/60">✦</span>
       <span className="pointer-events-none absolute right-[6%] top-[60%] text-2xl text-primary/30">✦</span>
 
-      {/* Large, blended illustration — absolutely positioned so it can be big
-          without squeezing the text column, with a soft radial glow instead
-          of a hard-edged circle so it melts into the background */}
       <div className="pointer-events-none absolute -right-32 top-1/2 hidden h-[85%] w-[68%] -translate-y-1/2 lg:block">
         <div
           className="absolute inset-0"
@@ -82,7 +84,7 @@ const Heading = () => {
       </div>
 
       <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-14 px-6 py-16 sm:px-10 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:py-24">
-        {/* Copy column */}
+        
         <div className="relative z-10 flex w-full flex-col items-start gap-5 text-start lg:max-w-140">
           <span
             className="fade-up flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-gray-700 shadow-sm"
@@ -116,7 +118,6 @@ const Heading = () => {
             pick a time, and show up to play with people who actually want to play too.
           </p>
 
-          {/* CTAs */}
           <div
             className="fade-up flex w-full flex-col items-stretch gap-3 pt-2 sm:flex-row sm:items-center"
             style={{ animationDelay: "0.45s" }}
@@ -124,7 +125,7 @@ const Heading = () => {
             <Button
               asChild
               size="lg"
-              className="h-13 w-full rounded-full bg-primary text-base font-bold text-white shadow-[0_10px_24px_rgba(120,241,144,0.5)] transition-transform duration-300 hover:scale-[1.03] hover:bg-primary sm:w-auto sm:px-8"
+              className="h-13 w-full rounded-lg bg-primary text-base font-bold text-white shadow-[0_10px_24px_rgba(120,241,144,0.5)] transition-transform duration-300 hover:scale-[1.03] hover:bg-primary sm:w-auto sm:px-8"
             >
               <Link href="/games">Find Players</Link>
             </Button>
@@ -132,7 +133,7 @@ const Heading = () => {
               asChild
               size="lg"
               variant="outline"
-              className="group h-13 w-full rounded-full border-2 border-gray-200 bg-white text-base font-bold text-gray-700 transition-colors duration-300 hover:bg-gray-50 sm:w-auto sm:px-6"
+              className="group h-13 w-full rounded-lg border-2 border-gray-200 bg-white text-base font-bold text-gray-700 transition-colors duration-300 hover:bg-gray-50 sm:w-auto sm:px-6"
             >
               <Link href="/how-it-works" className="flex items-center justify-center gap-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110">
@@ -143,7 +144,6 @@ const Heading = () => {
             </Button>
           </div>
 
-          {/* Trust row */}
           <div
             className="fade-up flex items-center gap-3 pt-1"
             style={{ animationDelay: "0.55s" }}
@@ -173,7 +173,6 @@ const Heading = () => {
           </div>
         </div>
 
-        {/* Mobile-only illustration — the large blended version above is desktop-only */}
         <div className="relative z-0 w-full max-w-100 lg:hidden">
           <div className="relative aspect-square w-full">
             <div className="absolute inset-6 rounded-full bg-primary/15" />
@@ -191,9 +190,6 @@ const Heading = () => {
         </div>
       </div>
 
-      {/* Search — floats centered over the whole section, fully opaque so it
-          cleanly covers whatever's behind it instead of letting text show
-          through a translucent bar */}
       <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center px-6">
         <div
           className={cn(
@@ -202,7 +198,7 @@ const Heading = () => {
           )}
           style={{ animationDelay: "0.35s" }}
         >
-          <div className="flex items-center gap-2 rounded-full border border-white/30 bg-white/20 backdrop-blur-[60px] shadow-[0_8px_32px_rgba(255,255,255,0.2)_inset,0_8px_32px_rgba(0,0,0,0.15)] p-2 pl-5">
+          <div className="flex items-center gap-2 rounded-lg border border-white/30 bg-white/20 backdrop-blur-[60px] shadow-[0_8px_32px_rgba(255,255,255,0.2)_inset,0_8px_32px_rgba(0,0,0,0.15)] p-2 pl-5">
             <FaMapMarkerAlt className="shrink-0 text-lg text-primary" />
             <Input
               type="text"
@@ -213,12 +209,12 @@ const Heading = () => {
             />
             <button
               aria-label="Search"
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-xl text-white transition-transform duration-300 hover:scale-110"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary text-xl text-white transition-transform duration-300 hover:scale-110"
             >
               <MdSearch />
             </button>
           </div>
-          {/* Marks the point Navbar's hook watches to know when this has scrolled out of view */}
+          
           <div id="heading-search" className="relative top-full h-px w-full" />
         </div>
       </div>

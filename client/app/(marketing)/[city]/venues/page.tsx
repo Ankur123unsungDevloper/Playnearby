@@ -1,9 +1,11 @@
 import Link from "next/link";
+
 import { getVenues } from "@/lib/api";
+
 import { VenueCard } from "@/components/VenueCard";
-import { AppNavbar } from "@/components/AppNavbar";
-import { AppFooter } from "@/components/AppFooter";
+
 import { cityLabel } from "@/lib/geocode";
+
 import { SportsFilterBar } from "@/components/Sportsfilterbar";
 import { Input } from "@/components/ui/input";
 
@@ -21,9 +23,7 @@ export default async function CityVenuesPage({
   const venues = await getVenues({ sport });
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      <AppNavbar />
-
+    <div className="flex mt-15 flex-col bg-gray-50">
       <div className="flex flex-row w-full bg-primary py-4 text-white">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 sm:px-6 items-center">
           <h1 className="text-3xl font-extrabold sm:text-4xl">Venues in {cityLabel(city)}</h1>
@@ -41,9 +41,7 @@ export default async function CityVenuesPage({
           </div>
         </div>
       </div>
-
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-10 sm:px-6">
-
         {venues.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-3xl bg-white py-20 text-center shadow-sm">
             <p className="text-gray-500">No venues listed yet.</p>
@@ -59,8 +57,6 @@ export default async function CityVenuesPage({
           </div>
         )}
       </main>
-
-      <AppFooter />
     </div>
   );
 }

@@ -10,8 +10,6 @@ import { getGameById, getGames, getVenues } from "@/lib/api";
 import { formatGameDate, formatGameTimeRange } from "@/lib/format";
 import { SPORT_LABELS } from "@/lib/sport-meta";
 
-import { AppNavbar } from "@/components/AppNavbar";
-import { AppFooter } from "@/components/AppFooter";
 import { JoinGameButton } from "@/components/JoinGameButton";
 import { SectionHeader } from "@/components/SectionHeader";
 import { CarouselRow } from "@/components/CarouselRow";
@@ -44,9 +42,7 @@ export default async function GameDetailPage({ params }: { params: Promise<{ id:
   const venuesNearby = venues.filter((v) => v.sports.includes(game.sport)).slice(0, 3);
 
   return (
-    <div className="bg-surface print:hidden pb-40 text-main box-border">
-      <AppNavbar />
-
+    <div className="bg-surface print:hidden pb-40 text-main box-border mt-15">
       <main className="flex flex-col">
         <div className="max-w-page p-4 md:px-0 md:mx-12 md:pt-6 xxl:w-[1440px] xxl:px-0 xl:mx-12 xxl:mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-[auto_360px] gap-x-6 w-full relative">
@@ -228,8 +224,6 @@ export default async function GameDetailPage({ params }: { params: Promise<{ id:
           </div>
         </div>
       </main>
-
-      <AppFooter />
     </div>
   );
 }

@@ -8,8 +8,6 @@ import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { getVenueById, getGames } from "@/lib/api";
 
 import { GameCard } from "@/components/GameCard";
-import { AppNavbar } from "@/components/AppNavbar";
-import { AppFooter } from "@/components/AppFooter";
 import { VenueGallery } from "@/components/VenueGallery";
 
 import { SPORT_ICONS, SPORT_LABELS } from "@/lib/sport-meta";
@@ -24,6 +22,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+
 
 // Shared card style so Timing / Location / Sports / Amenities / About /
 // Related all read as one consistent family instead of six separately
@@ -43,9 +42,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ id
   const gamesHere = allGames.filter((g) => g.venue?.id === venue.id);
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      <AppNavbar />
-
+    <div className="flex mt-15 flex-col bg-gray-50">
       <main className="flex flex-col justify-center mx-4 lg:mx-20">
         <div className="grid w-full grid-cols-1  justify-items-center">
           <div className="w-full col-span-1 pb-10 px-2 md:px-0">
@@ -221,29 +218,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ id
             </div>
           </div>
         </div>
-
-        {/* Gallery + sidebar (timing, location) */}
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          <div className="md:col-span-2">
-          </div>
-
-          <div className="flex flex-col gap-5">
-
-            
-          </div>
-        </div>
-
-        {/* Sports, amenities, about, related — one consistent column */}
-        <div className="flex flex-col gap-5">
-
-
-
-        </div>
-
-        {/* Upcoming games */}
       </main>
-
-      <AppFooter />
     </div>
   );
 }
